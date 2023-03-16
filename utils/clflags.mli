@@ -13,6 +13,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
+
 (** Command line flags *)
 
 (** Optimization parameters represented as ints indexed by round number. *)
@@ -69,10 +71,12 @@ val use_inlining_arguments_set : ?round:int -> inlining_arguments -> unit
 val objfiles : string list ref
 val ccobjs : string list ref
 val dllibs : string list ref
+val cmi_file : string option ref
 val compile_only : bool ref
 val output_name : string option ref
 val include_dirs : string list ref
 val no_std_include : bool ref
+val no_cwd : bool ref
 val print_types : bool ref
 val make_archive : bool ref
 val debug : bool ref
@@ -127,6 +131,7 @@ val locations : bool ref
 val dump_source : bool ref
 val dump_parsetree : bool ref
 val dump_typedtree : bool ref
+val dump_shape : bool ref
 val dump_rawlambda : bool ref
 val dump_lambda : bool ref
 val dump_rawclambda : bool ref
@@ -142,8 +147,6 @@ val dump_cmm : bool ref
 val dump_selection : bool ref
 val dump_cse : bool ref
 val dump_live : bool ref
-val dump_avail : bool ref
-val debug_runavail : bool ref
 val dump_spill : bool ref
 val dump_split : bool ref
 val dump_interf : bool ref
@@ -191,7 +194,6 @@ val with_runtime : bool ref
 val force_slash : bool ref
 val keep_docs : bool ref
 val keep_locs : bool ref
-val unsafe_string : bool ref
 val opaque : bool ref
 val profile_columns : Profile.column list ref
 val flambda_invariant_checks : bool ref
@@ -201,6 +203,7 @@ val default_unbox_closures_factor : int
 val unbox_free_vars_of_closures : bool ref
 val unbox_specialised_args : bool ref
 val clambda_checks : bool ref
+val cmm_invariants : bool ref
 val default_inline_max_depth : int
 val inline_max_depth : Int_arg_helper.parsed ref
 val remove_unused_arguments : bool ref
@@ -215,6 +218,7 @@ val dumped_pass : string -> bool
 val set_dumped_pass : string -> bool -> unit
 
 val dump_into_file : bool ref
+val dump_dir : string option ref
 
 (* Support for flags that can also be set from an environment variable *)
 type 'a env_reader = {
@@ -260,11 +264,8 @@ val arg_spec : (string * Arg.spec * string) list ref
    added. *)
 val add_arguments : string -> (string * Arg.spec * string) list -> unit
 
-(* [parse_arguments argv anon_arg usage] will parse the arguments, using
-  the arguments provided in [Clflags.arg_spec].
-*)
-val parse_arguments : string array -> Arg.anon_fun -> string -> unit
-
+(* [create_usage_msg program] creates a usage message for [program] *)
+val create_usage_msg: string -> string
 (* [print_arguments usage] print the standard usage message *)
 val print_arguments : string -> unit
 

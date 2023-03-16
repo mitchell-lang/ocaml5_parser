@@ -1,13 +1,31 @@
-; block warning 26, 27, 32, 6
+;**************************************************************************
+;*                                                                        *
+;*                                 OCaml                                  *
+;*                                                                        *
+;*                     Thomas Refis, Jane Street Europe                   *
+;*                                                                        *
+;*   Copyright 2018 Jane Street Group LLC                                 *
+;*                                                                        *
+;*   All rights reserved.  This file is distributed under the terms of    *
+;*   the GNU Lesser General Public License version 2.1, with the          *
+;*   special exception on linking described in the file LICENSE.          *
+;*                                                                        *
+;**************************************************************************
+
 (env
- (dev     (flags (:standard -w +a-4-9-40-41-42-44-45-48-27-32-26-6-67)))
- (release (flags (:standard -w +a-4-9-40-41-42-44-45-48-27-32-26-6-67))))
+ (dev     (flags (:standard -w +a-4-9-40-41-42-44-45-48-66-67-70)))
+ (release (flags (:standard -w +a-4-9-40-41-42-44-45-48-66-67-70))))
+
+;; Too annoying to get to work. Use (copy_files# ...) instead
+; (include_subdirs unqualified)
+; (ignored_subdirs (lex yacc testsuite ocamldoc ocamltest toplevel otherlibs))
 
 (copy_files# utils/*.ml{,i})
-(copy_files# file_formats/*.ml{,i})
 (copy_files# parsing/*.ml{,i})
 (copy_files# typing/*.ml{,i})
 (copy_files# driver/*.ml{,i})
+(copy_files# file_formats/*.ml{,i})
+(copy_files# stdlib/*.ml{,i})
 
 (library
  (name ocaml_parser)
@@ -17,22 +35,11 @@
    annot asttypes outcometree parsetree)
  (modules
    ;; UTILS
-   config
-   build_path_prefix_map misc identifiable numbers arg_helper clflags
+   zint
+   config build_path_prefix_map misc identifiable numbers arg_helper clflags
    profile terminfo ccomp warnings consistbl strongly_connected_components
    targetint load_path int_replace_polymorphic_compare binutils local_store
-
-   ;; TYPING
-   ident path primitive types btype oprint subst predef datarepr
-   cmi_format persistent_env env type_immediacy
-   typedtree printtyped ctype printtyp includeclass mtype envaux includecore
-   tast_iterator tast_mapper cmt_format untypeast includemod
-   typetexp patterns printpat parmatch stypes typedecl rec_check
-   typecore
-   typeclass typemod typedecl_variance typedecl_properties typedecl_immediacy
-   typedecl_unboxed typedecl_separability cmt2annot
-   ; manual update: mli only files
-   annot outcometree
+   lazy_backtrack diffing diffing_with_keys
 
    ;; PARSING
    location longident docstrings syntaxerr ast_helper camlinternalMenhirLib
@@ -41,8 +48,19 @@
    ; manual update: mli only files
    asttypes parsetree
 
-   ;; DRIVER
-   pparse
-   frontend
- )
-)
+   ;; TYPING
+   ident path primitive shape types btype oprint subst predef datarepr
+   cmi_format persistent_env env type_immediacy errortrace
+   typedtree printtyped ctype printtyp includeclass mtype envaux includecore
+   tast_iterator tast_mapper signature_group cmt_format untypeast
+   includemod includemod_errorprinter
+   typetexp patterns printpat parmatch stypes typedecl typeopt rec_check
+   typecore
+   typeclass typemod typedecl_variance typedecl_properties typedecl_immediacy
+   typedecl_unboxed typedecl_separability cmt2annot
+   ; manual update: mli only files
+   annot outcometree
+
+   ;; some of COMP
+   pparse 
+ ))

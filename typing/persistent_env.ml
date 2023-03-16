@@ -27,7 +27,6 @@ type error =
   | Illegal_renaming of modname * modname * filepath
   | Inconsistent_import of modname * filepath * filepath
   | Need_recursive_types of modname
-  | Depend_on_unsafe_string_unit of modname
 
 exception Error of error
 let error err = raise (Error err)
@@ -45,7 +44,7 @@ end
 
 type can_load_cmis =
   | Can_load_cmis
-  | Cannot_load_cmis of EnvLazy.log
+  | Cannot_load_cmis of Lazy_backtrack.log
 
 type pers_struct = {
   ps_name: string;
@@ -138,13 +137,13 @@ let set_can_load_cmis penv setting =
   penv.can_load_cmis := setting
 
 let without_cmis penv f x =
-  let log = EnvLazy.log () in
+  let log = Lazy_backtrack.log () in
   let res =
     Misc.(protect_refs
             [R (penv.can_load_cmis, Cannot_load_cmis log)]
             (fun () -> f x))
   in
-  EnvLazy.backtrack log;
+  Lazy_backtrack.backtrack log;
   res
 
 let fold {persistent_structures; _} f x =
@@ -163,7 +162,6 @@ let save_pers_struct penv crc ps pm =
     (function
         | Rectypes -> ()
         | Alerts _ -> ()
-        | Unsafe_string -> ()
         | Opaque -> register_import_as_opaque penv modname)
     ps.ps_flags;
   Consistbl.set crc_units modname crc ps.ps_filename;
@@ -186,9 +184,6 @@ let acknowledge_pers_struct penv check modname pers_sig pm =
         | Rectypes ->
             if not !Clflags.recursive_types then
               error (Need_recursive_types(ps.ps_name))
-        | Unsafe_string ->
-            if Config.safe_string then
-              error (Depend_on_unsafe_string_unit(ps.ps_name));
         | Alerts _ -> ()
         | Opaque -> register_import_as_opaque penv modname)
     ps.ps_flags;
@@ -252,9 +247,6 @@ let check_pers_struct penv f ~loc name =
             Format.sprintf
               "%s uses recursive types"
               name
-        | Depend_on_unsafe_string_unit name ->
-            Printf.sprintf "%s uses -unsafe-string"
-              name
       in
       let warn = Warnings.No_cmi_file(name, Some msg) in
         Location.prerr_warning loc warn
@@ -306,7 +298,6 @@ let make_cmi penv modname sign alerts =
     List.concat [
       if !Clflags.recursive_types then [Cmi_format.Rectypes] else [];
       if !Clflags.opaque then [Cmi_format.Opaque] else [];
-      (if !Clflags.unsafe_string then [Cmi_format.Unsafe_string] else []);
       [Alerts alerts];
     ]
   in
@@ -358,11 +349,6 @@ let report_error ppf =
       fprintf ppf
         "@[<hov>Invalid import of %s, which uses recursive types.@ %s@]"
         import "The compilation flag -rectypes is required"
-  | Depend_on_unsafe_string_unit(import) ->
-      fprintf ppf
-        "@[<hov>Invalid import of %s, compiled with -unsafe-string.@ %s@]"
-        import "This compiler has been configured in strict \
-                                  safe-string mode (-force-safe-string)"
 
 let () =
   Location.register_error_of_exn

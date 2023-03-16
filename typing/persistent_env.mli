@@ -24,7 +24,6 @@ type error =
   | Illegal_renaming of modname * modname * filepath
   | Inconsistent_import of modname * filepath * filepath
   | Need_recursive_types of modname
-  | Depend_on_unsafe_string_unit of modname
 
 exception Error of error
 
@@ -43,7 +42,7 @@ end
 
 type can_load_cmis =
   | Can_load_cmis
-  | Cannot_load_cmis of Misc.EnvLazy.log
+  | Cannot_load_cmis of Lazy_backtrack.log
 
 type 'a t
 
