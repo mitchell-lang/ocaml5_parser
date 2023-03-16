@@ -34,8 +34,9 @@
  (modules_without_implementation
    annot asttypes outcometree parsetree)
  (modules
+   ;; STDLIB
+   zint zstring zsys
    ;; UTILS
-   zint
    config build_path_prefix_map misc identifiable numbers arg_helper clflags
    profile terminfo ccomp warnings consistbl strongly_connected_components
    targetint load_path int_replace_polymorphic_compare binutils local_store
@@ -54,7 +55,9 @@
    typedtree printtyped ctype printtyp includeclass mtype envaux includecore
    tast_iterator tast_mapper signature_group cmt_format untypeast
    includemod includemod_errorprinter
-   typetexp patterns printpat parmatch stypes typedecl typeopt rec_check
+   typetexp patterns printpat parmatch stypes typedecl
+   ;; typeopt
+   rec_check
    typecore
    typeclass typemod typedecl_variance typedecl_properties typedecl_immediacy
    typedecl_unboxed typedecl_separability cmt2annot

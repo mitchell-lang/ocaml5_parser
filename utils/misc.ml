@@ -518,7 +518,7 @@ let edit_distance a b cutoff =
   let cutoff =
     (* using max_int for cutoff would cause overflows in (i + cutoff + 1);
        we bring it back to the (max la lb) worstcase *)
-    Zint.min (Int.max la lb) cutoff in
+    Zint.min (Zint.max la lb) cutoff in
   if abs (la - lb) > cutoff then None
   else begin
     (* initialize with 'cutoff + 1' so that not-yet-written-to cases have
@@ -533,7 +533,7 @@ let edit_distance a b cutoff =
       m.(0).(j) <- j;
     done;
     for i = 1 to la do
-      for j = Int.max 1 (i - cutoff - 1) to Zint.min lb (i + cutoff + 1) do
+      for j = Zint.max 1 (i - cutoff - 1) to Zint.min lb (i + cutoff + 1) do
         let cost = if a.[i-1] = b.[j-1] then 0 else 1 in
         let best =
           (* insert, delete or substitute *)
@@ -786,7 +786,7 @@ let delete_eol_spaces src =
 
 let pp_two_columns ?(sep = "|") ?max_lines ppf (lines: (string * string) list) =
   let left_column_size =
-    List.fold_left (fun acc (s, _) -> Int.max acc (String.length s)) 0 lines in
+    List.fold_left (fun acc (s, _) -> Zint.max acc (String.length s)) 0 lines in
   let lines_nb = List.length lines in
   let ellipsed_first, ellipsed_last =
     match max_lines with

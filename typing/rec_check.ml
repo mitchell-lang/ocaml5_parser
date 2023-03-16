@@ -584,20 +584,7 @@ let rec expression : Typedtree.expression -> term_judg =
         join [expression e; list arg args] << app_mode
     | Texp_tuple exprs ->
       list expression exprs << Guard
-    | Texp_array exprs ->
-      let array_mode = match Typeopt.array_kind exp with
-        | Lambda.Pfloatarray ->
-            (* (flat) float arrays unbox their elements *)
-            Dereference
-        | Lambda.Pgenarray ->
-            (* This is counted as a use, because constructing a generic array
-               involves inspecting to decide whether to unbox (PR#6939). *)
-            Dereference
-        | Lambda.Paddrarray | Lambda.Pintarray ->
-            (* non-generic, non-float arrays act as constructors *)
-            Guard
-      in
-      list expression exprs << array_mode
+    | Texp_array _ -> failwith "ZZ: removed from the ocaml5_parser"
     | Texp_construct (_, desc, exprs) ->
       let access_constructor =
         match desc.cstr_tag with
@@ -786,21 +773,7 @@ let rec expression : Typedtree.expression -> term_judg =
       *)
       let case_env c m = fst (case c m) in
       list case_env cases << Delay
-    | Texp_lazy e ->
-      (*
-        G |- e: m[Delay]
-        ----------------  (modulo some subtle compiler optimizations)
-        G |- lazy e: m
-      *)
-      let lazy_mode = match Typeopt.classify_lazy_argument e with
-        | `Constant_or_function
-        | `Identifier _
-        | `Float_that_cannot_be_shortcut ->
-          Return
-        | `Other ->
-          Delay
-      in
-      expression e << lazy_mode
+    | Texp_lazy _ -> failwith "ZZ: removed from ocaml5_parser"
     | Texp_letop{let_; ands; body; _} ->
         let case_env c m = fst (case c m) in
         join [

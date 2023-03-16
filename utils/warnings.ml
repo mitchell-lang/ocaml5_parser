@@ -202,12 +202,12 @@ type description =
        deprecated. The current name should always be derived mechanically from
        the constructor name. *)
     description : string;
-    since : Sys.ocaml_release_info option;
+    since : Zsys.ocaml_release_info option;
     (* The compiler version introducing this warning; only tagged for warnings
        created after 3.12, which introduced the numbered syntax. *)
   }
 
-let since major minor = Some { Sys.major; minor; patchlevel=0; extra=None }
+let since major minor = Some { Zsys.major; minor; patchlevel=0; extra=None }
 
 let descriptions = [
   { number = 1;
@@ -731,7 +731,7 @@ let letter_alert tokens =
       let nowhere = ghost_loc_in_file "_none_" in
       let spelling_hint ppf =
         let max_seq_len =
-          List.fold_left (fun l x -> Int.max l (List.length x))
+          List.fold_left (fun l x -> Zint.max l (List.length x))
             0 consecutive_letters
         in
         if max_seq_len >= 5 then
@@ -826,7 +826,7 @@ let parse_opt error active errflag s =
         in
         List.iter (action modifier) (letter lc)
     | Num(n1,n2,modifier) ->
-        for n = n1 to Int.min n2 last_warning_number do action modifier n done
+        for n = n1 to Zint.min n2 last_warning_number do action modifier n done
   in
   let parse_and_eval s =
     let tokens = parse_warnings s in
@@ -1200,9 +1200,9 @@ let check_fatal () =
 
 let pp_since out release_info =
   Printf.fprintf out " (since %d.%0*d)"
-    release_info.Sys.major
-    (if release_info.Sys.major >= 5 then 0 else 2)
-    release_info.Sys.minor
+    release_info.Zsys.major
+    (if release_info.Zsys.major >= 5 then 0 else 2)
+    release_info.Zsys.minor
 
 let help_warnings () =
   List.iter

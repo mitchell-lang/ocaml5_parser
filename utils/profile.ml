@@ -266,7 +266,7 @@ let width_by_column ~n_columns ~display_cell rows =
   let rec loop (R (_, values, rows)) =
     List.iteri (fun i cell ->
       let _, str = display_cell i cell ~width:0 in
-      a.(i) <- Int.max a.(i) (String.length str)
+      a.(i) <- Zint.max a.(i) (String.length str)
     ) values;
     List.iter loop rows;
   in
