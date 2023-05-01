@@ -28,8 +28,8 @@
 (copy_files# stdlib/*.ml{,i})
 
 (library
- (name ocaml_parser)
- (public_name ocaml_parser)
+ (name ocaml5_parser)
+ (public_name ocaml5_parser)
  (flags (:standard -principal))
  (modules_without_implementation
    annot asttypes outcometree parsetree)
